@@ -1,9 +1,11 @@
-﻿using GoGBot.BLL.Models;
+﻿using GoGBot.BLL.Providers.Commands;
 using GoGBot.BLL.Providers.Interfaces;
 using GoGBot.BLL.Services.Interfaces;
+using Hangfire;
 using Microsoft.Extensions.Configuration;
 using Shared.Configurations;
 using Shared.Constants;
+using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -13,15 +15,17 @@ namespace GoGBot.BLL.Services
     public class BotService : IBotService
     {
         private TelegramBotClient _botClient;
-        private IBotCommandProvider _botCommandProvider;
+
         private readonly IConfiguration _configuration;
         private readonly INewsProvider _newsProvider;
+        private readonly IServiceProvider _serviceProvider;
 
-        public BotService(IBotCommandProvider botCommandProvider, IConfiguration configuration, INewsProvider newsProvider)
+
+        public BotService(IConfiguration configuration, INewsProvider newsProvider, IServiceProvider serviceProvider)
         {
-            _botCommandProvider = botCommandProvider;
             _configuration = configuration;
             _newsProvider = newsProvider;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task<TelegramBotClient> GetBotClientAsync()
@@ -36,39 +40,35 @@ namespace GoGBot.BLL.Services
 
             //For debug by ngrok
 
-            //await _botClient.SetWebhookAsync("https://269b6b09f10f.ngrok.io/api/message/update");
+            await _botClient.SetWebhookAsync("https://53bb4a1460a3.ngrok.io/api/message/update");
 
 
-            string hookUrl = $"{_configuration[$"{nameof(Configuratins.BotSettings)}:{nameof(Configuratins.BotSettings.AppUrl)}"]}";
-            string hookRoute = $"{Constant.Routes.MESSAGE_CONTROLLER}/{Constant.Routes.MESSAGE_UPDATE_ROUTE}";
+            //string hookUrl = $"{_configuration[$"{nameof(Configuratins.BotSettings)}:{nameof(Configuratins.BotSettings.AppUrl)}"]}";
+            //string hookRoute = $"{Constant.Routes.MESSAGE_CONTROLLER}/{Constant.Routes.MESSAGE_UPDATE_ROUTE}";
 
-            await _botClient.SetWebhookAsync($"{hookUrl}{hookRoute}");
+            //await _botClient.SetWebhookAsync($"{hookUrl}{hookRoute}");
 
             return _botClient;
 
         }
 
-        public async Task ExecuteIfCanAsync(Update update)
+        public async Task SetupAndExecuteAsync(Update update)
         {
             if (update is null)
             {
                 return;
             }
-            var client = await GetBotClientAsync();
-            var responseContent = await GetContentModel();
-            await _botCommandProvider.ExecuteAsync(update.Message, client, responseContent);
-        }
-
-        public async Task<MessageContentModel> GetContentModel()
-        {
-            var theme = _newsProvider.GetCurrentTheme();
-            var responseContent = await _newsProvider.GetCurrentNewsAsync(theme);//TODO EE: improve method for get different content by theme
-            return new MessageContentModel
+            if (update.Message.Text.Equals(Constant.BotMessageConstant.START_FORISMATIC_COMMAND))
             {
-                ContentData = responseContent,
-                ContentType = Shared.Enums.Enum.ContentType.Text,//TODO EE: add dynamic receiving instead of hard code
-                Theme = theme,
-            };
+                RecurringJob.AddOrUpdate<ForismaticBotCommand>(nameof(ForismaticBotCommand),
+                    (command) => command.ExecuteAsync(update.Message), Cron.Daily);
+            }
+            if (update.Message.Text.Equals(Constant.BotMessageConstant.START_COLLECT_COMMAND))
+            {
+                RecurringJob.AddOrUpdate<CollectBotCommand>(nameof(CollectBotCommand),
+                    (command) => command.ExecuteAsync(update.Message), Cron.Monthly(29));
+            }
+
         }
     }
 }

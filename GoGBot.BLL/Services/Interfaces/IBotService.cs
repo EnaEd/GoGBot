@@ -7,6 +7,6 @@ namespace GoGBot.BLL.Services.Interfaces
     public interface IBotService
     {
         public Task<TelegramBotClient> GetBotClientAsync();
-        public Task ExecuteIfCanAsync(Update update);
+        public Task SetupAndExecuteAsync(Update update);
     }
 }

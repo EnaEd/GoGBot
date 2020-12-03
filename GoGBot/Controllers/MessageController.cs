@@ -1,5 +1,4 @@
 ﻿using GoGBot.BLL.Services.Interfaces;
-using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Constants;
 using System.Threading.Tasks;
@@ -23,7 +22,7 @@ namespace GoGBot.Controllers
         public async Task<IActionResult> Post([FromBody] Update update)
         {
 
-            RecurringJob.AddOrUpdate(() => _botService.ExecuteIfCanAsync(update), Cron.Daily);
+            await _botService.SetupAndExecuteAsync(update);
 
             return Ok();
         }
