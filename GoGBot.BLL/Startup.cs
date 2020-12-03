@@ -14,7 +14,7 @@ namespace GoGBot.BLL
 
             services.AddTransient<IBotCommandProvider, ForismaticBotCommand>();
             services.AddTransient<IBotCommandProvider, CollectBotCommand>();
-
+            services.AddTransient<IBotCommandProvider, InfoBotCommand>();
             services.AddTransient<IBotClientProvider, BotClientProvider>();
 
             services.AddTransient<IBotService, BotService>();

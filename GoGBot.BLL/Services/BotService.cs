@@ -19,13 +19,15 @@ namespace GoGBot.BLL.Services
         private readonly IConfiguration _configuration;
         private readonly INewsProvider _newsProvider;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IBotCommandProvider _botCommandProvider;
 
 
-        public BotService(IConfiguration configuration, INewsProvider newsProvider, IServiceProvider serviceProvider)
+        public BotService(IConfiguration configuration, INewsProvider newsProvider, IServiceProvider serviceProvider, IBotCommandProvider botCommandProvider)
         {
             _configuration = configuration;
             _newsProvider = newsProvider;
             _serviceProvider = serviceProvider;
+            _botCommandProvider = botCommandProvider;
         }
 
         public async Task<TelegramBotClient> GetBotClientAsync()
@@ -67,6 +69,11 @@ namespace GoGBot.BLL.Services
             {
                 RecurringJob.AddOrUpdate<CollectBotCommand>(nameof(CollectBotCommand),
                     (command) => command.ExecuteAsync(update.Message), Cron.Monthly(29));
+            }
+            if (update.Message.Text.Equals(Constant.BotMessageConstant.HELP_COMMAND))
+            {
+                var provider = _botCommandProvider as InfoBotCommand;
+                await provider.ExecuteAsync(update.Message);
             }
 
         }
