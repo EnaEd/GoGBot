@@ -8,17 +8,17 @@ namespace Shared.Enums
         {
             [EnumDescriptor()]
             None = 0,
-            [EnumDescriptor("Andy", "Tolmachev")]
+            [EnumDescriptor("Andy", "Tolmachev", null, "Main man")]
             MainPlayer = 592902264,
-            [EnumDescriptor("Alex", "Ageenko")]
+            [EnumDescriptor("Alex", "Ageenko", null, "The Immigrant")]
             BasicFirst = 599707177,
-            [EnumDescriptor("Vasja", null, "Fukcman1")]
+            [EnumDescriptor("Vasja", null, "Fukcman1", "Fukcman1")]
             BasicSecond = 460393099,
-            [EnumDescriptor("Yugen", "Kononenko")]
+            [EnumDescriptor("Yugen", "Kononenko", null, "The Little")]
             BasicThrird = 767456173,
-            [EnumDescriptor("Ed", "Ena")]
-            BasicFour = 385595104,
-            [EnumDescriptor("Max", "Beard")]
+            [EnumDescriptor("Ed", "Ena", null, "just hatzker")]
+            Admin = 385595104,
+            [EnumDescriptor("Max", "Beard", null, "Beard")]
             BasicFive = 585878720
 
         }

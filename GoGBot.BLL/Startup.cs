@@ -11,11 +11,14 @@ namespace GoGBot.BLL
     {
         public static void InitStartup(this IServiceCollection services)
         {
+            services.AddTransient<HandleTeamBotCommand>();
+            services.AddTransient<InfoBotCommand>();
 
             services.AddTransient<IBotCommandProvider, ForismaticBotCommand>();
             services.AddTransient<IBotCommandProvider, CollectBotCommand>();
-            services.AddTransient<IBotCommandProvider, InfoBotCommand>();
-            services.AddTransient<IBotCommandProvider, HandleTeamBotCommand>();
+            //services.AddTransient<IBotCommandProvider, InfoBotCommand>();
+            //services.AddTransient<IBotCommandProvider, HandleTeamBotCommand>();
+            services.AddTransient<IBotCommandProvider, CollectStatisticBotCommand>();
 
 
             services.AddTransient<IBotService, BotService>();

@@ -42,6 +42,7 @@ namespace GoGBot.BLL.Providers.Commands
                 elector.Id = message.From.Id;
                 elector.FirstName = electorType.GetAttribute<EnumDescriptor>().FirstName;
                 elector.LastName = electorType.GetAttribute<EnumDescriptor>().LastName;
+                elector.NickName = electorType.GetAttribute<EnumDescriptor>().NickName;
 
                 _electorService.ElectorsTeam.Add(elector);
                 await OnSaveVote(message);

@@ -16,12 +16,14 @@ namespace Shared.Extension
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string UserName { get; set; }
+        public string NickName { get; set; }
 
-        public EnumDescriptor(string firstName = null, string lastName = null, string userName = null)
+        public EnumDescriptor(string firstName = null, string lastName = null, string userName = null, string nick = null)
         {
             FirstName = firstName is null ? string.Empty : firstName;
             LastName = lastName is null ? string.Empty : lastName;
             UserName = userName is null ? string.Empty : userName;
+            NickName = nick is null ? string.Empty : nick;
         }
     }
 }

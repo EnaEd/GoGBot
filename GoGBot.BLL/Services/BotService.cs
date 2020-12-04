@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using static Shared.Enums.Enum;
 
 namespace GoGBot.BLL.Services
 {
@@ -42,13 +43,13 @@ namespace GoGBot.BLL.Services
 
             //For debug by ngrok
 
-            await _botClient.SetWebhookAsync("https://30afdd1f9ed5.ngrok.io/api/message/update");
+            //await _botClient.SetWebhookAsync("https://30afdd1f9ed5.ngrok.io/api/message/update");
 
 
-            //string hookUrl = $"{_configuration[$"{nameof(Configuratins.BotSettings)}:{nameof(Configuratins.BotSettings.AppUrl)}"]}";
-            //string hookRoute = $"{Constant.Routes.MESSAGE_CONTROLLER}/{Constant.Routes.MESSAGE_UPDATE_ROUTE}";
+            string hookUrl = $"{_configuration[$"{nameof(Configuratins.BotSettings)}:{nameof(Configuratins.BotSettings.AppUrl)}"]}";
+            string hookRoute = $"{Constant.Routes.MESSAGE_CONTROLLER}/{Constant.Routes.MESSAGE_UPDATE_ROUTE}";
 
-            //await _botClient.SetWebhookAsync($"{hookUrl}{hookRoute}");
+            await _botClient.SetWebhookAsync($"{hookUrl}{hookRoute}");
 
             return _botClient;
 
@@ -60,15 +61,17 @@ namespace GoGBot.BLL.Services
             {
                 return;
             }
-            if (update.Message.Text.Equals(Constant.BotMessageConstant.START_FORISMATIC_COMMAND))
+            if (update.Message.Text.Equals(Constant.BotMessageConstant.START_FORISMATIC_COMMAND)
+                && update.Message.From.Id == (int)TeamPlayersType.Admin)
             {
                 RecurringJob.AddOrUpdate<ForismaticBotCommand>(nameof(ForismaticBotCommand),
                     (command) => command.ExecuteAsync(update.Message), Cron.Daily);
             }
-            if (update.Message.Text.Equals(Constant.BotMessageConstant.START_COLLECT_COMMAND))
+            if (update.Message.Text.Equals(Constant.BotMessageConstant.START_COLLECT_COMMAND)
+                && update.Message.From.Id == (int)TeamPlayersType.Admin)
             {
                 RecurringJob.AddOrUpdate<CollectBotCommand>(nameof(CollectBotCommand),
-                    (command) => command.ExecuteAsync(update.Message), Cron.Monthly(29));
+                    (command) => command.ExecuteAsync(update.Message), Cron.Monthly(28));
             }
             if (update.Message.Text.Equals(Constant.BotMessageConstant.HELP_COMMAND))
             {
@@ -78,8 +81,15 @@ namespace GoGBot.BLL.Services
             if (update.Message.Text.Equals(Constant.BotMessageConstant.FOLLOW_ACCEPT_COMMAND) ||
                 update.Message.Text.Equals(Constant.BotMessageConstant.FOLLOW_DENIED_COMMAND))
             {
-                var provider = _botCommandProvider as HandleTeamBotCommand;
+                //var provider = _botCommandProvider as HandleTeamBotCommand;
+                var provider = _serviceProvider.GetService(typeof(HandleTeamBotCommand)) as HandleTeamBotCommand;
                 await provider.ExecuteAsync(update.Message);
+            }
+            if (update.Message.Text.Equals(Constant.BotMessageConstant.COLLECT_STAT_COMMAND)
+                && update.Message.From.Id == (int)TeamPlayersType.Admin)
+            {
+                RecurringJob.AddOrUpdate<CollectStatisticBotCommand>(nameof(CollectStatisticBotCommand),
+                    (command) => command.ExecuteAsync(update.Message), Cron.Monthly(1));
             }
 
 
