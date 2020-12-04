@@ -10,6 +10,7 @@
             public const string FOLLOW_ACCEPT_COMMAND = "/+";
             public const string FOLLOW_DENIED_COMMAND = "/-";
             public const string HELP_COMMAND = "/help";
+            public const string IQ_GAME_COMMAND = "/game";
         }
     }
 

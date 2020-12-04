@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using static Shared.Enums.Enum;
 
 namespace GoGBot.BLL.Services
@@ -21,14 +22,17 @@ namespace GoGBot.BLL.Services
         private readonly INewsProvider _newsProvider;
         private readonly IServiceProvider _serviceProvider;
         private readonly IBotCommandProvider _botCommandProvider;
+        private readonly IBotClientProvider _botClientProvider;
 
 
-        public BotService(IConfiguration configuration, INewsProvider newsProvider, IServiceProvider serviceProvider, IBotCommandProvider botCommandProvider)
+
+        public BotService(IConfiguration configuration, INewsProvider newsProvider, IServiceProvider serviceProvider, IBotCommandProvider botCommandProvider, IBotClientProvider botClientProvider)
         {
             _configuration = configuration;
             _newsProvider = newsProvider;
             _serviceProvider = serviceProvider;
             _botCommandProvider = botCommandProvider;
+            _botClientProvider = botClientProvider;
         }
 
         public async Task<TelegramBotClient> GetBotClientAsync()
@@ -43,13 +47,13 @@ namespace GoGBot.BLL.Services
 
             //For debug by ngrok
 
-            //await _botClient.SetWebhookAsync("https://30afdd1f9ed5.ngrok.io/api/message/update");
+            await _botClient.SetWebhookAsync("https://30afdd1f9ed5.ngrok.io/api/message/update");
 
 
-            string hookUrl = $"{_configuration[$"{nameof(Configuratins.BotSettings)}:{nameof(Configuratins.BotSettings.AppUrl)}"]}";
-            string hookRoute = $"{Constant.Routes.MESSAGE_CONTROLLER}/{Constant.Routes.MESSAGE_UPDATE_ROUTE}";
+            //string hookUrl = $"{_configuration[$"{nameof(Configuratins.BotSettings)}:{nameof(Configuratins.BotSettings.AppUrl)}"]}";
+            //string hookRoute = $"{Constant.Routes.MESSAGE_CONTROLLER}/{Constant.Routes.MESSAGE_UPDATE_ROUTE}";
 
-            await _botClient.SetWebhookAsync($"{hookUrl}{hookRoute}");
+            //await _botClient.SetWebhookAsync($"{hookUrl}{hookRoute}");
 
             return _botClient;
 
@@ -59,6 +63,24 @@ namespace GoGBot.BLL.Services
         {
             if (update is null)
             {
+                return;
+            }
+            if (update.Type is UpdateType.CallbackQuery)
+            {
+                _botClient = await _botClientProvider.GetBotClientAsync();
+                _botClient.OnCallbackQuery += async (object sender, Telegram.Bot.Args.CallbackQueryEventArgs e) =>
+                {
+
+                    var message = e.CallbackQuery.Message;
+                    if (e.CallbackQuery.Data == "one")
+                    {
+                        await _botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id, "You hav choosen " + e.CallbackQuery.Data, true);
+                    }
+
+                    await _botClient.SendTextMessageAsync(message.Chat.Id, "тест", replyToMessageId: message.MessageId);
+                    await _botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id); // отсылаем пустое, чтобы убрать "частики" на кнопке
+
+                };
                 return;
             }
             if (update.Message.Text.Equals(Constant.BotMessageConstant.START_FORISMATIC_COMMAND)
@@ -90,6 +112,13 @@ namespace GoGBot.BLL.Services
             {
                 RecurringJob.AddOrUpdate<CollectStatisticBotCommand>(nameof(CollectStatisticBotCommand),
                     (command) => command.ExecuteAsync(update.Message), Cron.Monthly(1));
+            }
+
+            if (update.Message.Text.Equals(Constant.BotMessageConstant.IQ_GAME_COMMAND)
+                && update.Message.From.Id == (int)TeamPlayersType.Admin)
+            {
+                RecurringJob.AddOrUpdate<IQGameBotCommand>(nameof(IQGameBotCommand),
+                    (command) => command.ExecuteAsync(update.Message), Cron.Monthly(1, 10));
             }
 
 
