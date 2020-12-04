@@ -30,7 +30,7 @@ namespace GoGBot.BLL.Providers
 
             //For debug by ngrok
 
-            await BotClient.SetWebhookAsync("https://53bb4a1460a3.ngrok.io/api/message/update");
+            await BotClient.SetWebhookAsync("https://30afdd1f9ed5.ngrok.io/api/message/update");
 
 
             //string hookUrl = $"{_configuration[$"{nameof(Configuratins.BotSettings)}:{nameof(Configuratins.BotSettings.AppUrl)}"]}";

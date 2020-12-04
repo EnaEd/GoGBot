@@ -42,7 +42,7 @@ namespace GoGBot.BLL.Services
 
             //For debug by ngrok
 
-            await _botClient.SetWebhookAsync("https://53bb4a1460a3.ngrok.io/api/message/update");
+            await _botClient.SetWebhookAsync("https://30afdd1f9ed5.ngrok.io/api/message/update");
 
 
             //string hookUrl = $"{_configuration[$"{nameof(Configuratins.BotSettings)}:{nameof(Configuratins.BotSettings.AppUrl)}"]}";
@@ -74,6 +74,14 @@ namespace GoGBot.BLL.Services
             {
                 var provider = _botCommandProvider as InfoBotCommand;
                 await provider.ExecuteAsync(update.Message);
+            }
+            if (update.Message.Text.Equals(Constant.BotMessageConstant.FOLLOW_ACCEPT_COMMAND))
+            {
+
+            }
+            if (update.Message.Text.Equals(Constant.BotMessageConstant.FOLLOW_DENIED_COMMAND))
+            {
+
             }
 
         }
