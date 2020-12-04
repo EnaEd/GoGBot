@@ -2,9 +2,8 @@
 
 namespace Shared.Extension
 {
-    public class EnumExtension
+    public static class EnumExtension
     {
-
     }
     public class EnumDescriptor : Attribute
     {
