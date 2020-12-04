@@ -15,10 +15,11 @@ namespace GoGBot.BLL
             services.AddTransient<IBotCommandProvider, ForismaticBotCommand>();
             services.AddTransient<IBotCommandProvider, CollectBotCommand>();
             services.AddTransient<IBotCommandProvider, InfoBotCommand>();
+            services.AddTransient<IBotCommandProvider, HandleTeamBotCommand>();
 
 
             services.AddTransient<IBotService, BotService>();
-            services.AddTransient<IElectorService, ElectorService>();
+            services.AddSingleton<IElectorService, ElectorService>();
 
 
             services.AddTransient<IBotClientProvider, BotClientProvider>();

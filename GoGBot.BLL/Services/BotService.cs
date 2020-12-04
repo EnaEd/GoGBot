@@ -75,14 +75,13 @@ namespace GoGBot.BLL.Services
                 var provider = _botCommandProvider as InfoBotCommand;
                 await provider.ExecuteAsync(update.Message);
             }
-            if (update.Message.Text.Equals(Constant.BotMessageConstant.FOLLOW_ACCEPT_COMMAND))
+            if (update.Message.Text.Equals(Constant.BotMessageConstant.FOLLOW_ACCEPT_COMMAND) ||
+                update.Message.Text.Equals(Constant.BotMessageConstant.FOLLOW_DENIED_COMMAND))
             {
-
+                var provider = _botCommandProvider as HandleTeamBotCommand;
+                await provider.ExecuteAsync(update.Message);
             }
-            if (update.Message.Text.Equals(Constant.BotMessageConstant.FOLLOW_DENIED_COMMAND))
-            {
 
-            }
 
         }
     }

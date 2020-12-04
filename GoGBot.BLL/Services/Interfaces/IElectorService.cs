@@ -6,6 +6,7 @@ namespace GoGBot.BLL.Services.Interfaces
     public interface IElectorService
     {
         public List<Elector> ElectorsTeam { get; set; }
+        public bool IsCanVote { get; set; }
         public void GetElectors();
     }
 }
